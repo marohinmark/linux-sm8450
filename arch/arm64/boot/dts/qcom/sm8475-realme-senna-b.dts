@@ -17,7 +17,7 @@
 #include "pm8450.dtsi"
 #include "pmk8350.dtsi"
 #include "pmr735a.dtsi"
-
+/delete-node/ &qheebsp_reserved_mem;
 /delete-node/ &adsp_mem;
 /delete-node/ &video_mem;
 /delete-node/ &rmtfs_mem;
@@ -26,34 +26,61 @@
 	model = "Realme GT Neo5 150W";
 	compatible = "realme,senna-b", "qcom,sm8475";
 	chassis-type = "handset";
-
+	qcom,board-id = <0x10008 0x00>;
+	qcom,msm-id = <0x213 0x10000>, <0x21c 0x10000>, <0x212 0x10000>;	
 	chosen {
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
 
 		bootargs = "PMOS_NOSPLASH console=tty0";
+		framebuffer: framebuffer@b8000000 {
+			compatible = "simple-framebuffer";
+			reg = <0x0 0xb8000000 0x0 0x2b00000>;
+			width = <1240>;
+			height = <2772>;
+			stride = <(1240 * 4)>;
+			format = "a8r8g8b8";
+		};				
 	};
 
-	reserved-memory {		
-		adsp_mem: memory@85200000 {
+	reserved-memory {	
+		ramoops@85200000 {
+			compatible = "ramoops";
+			reg = <0x0 0x85200000 0x0 0x400000>;
+			record-size = <0x200000>;
+			pmsg-size = <0x200000>;
+			console-size = <0x200000>;
+			no-map;
+		};
+		
+		adsp_mem: memory@85700000 {
 			reg = <0x0 0x85700000 0x0 0x2800000>;
 			no-map;
 		};
 		
-		video_mem: memory@85700000 {
+		video_mem: memory@9fd00000 {
 			no-map;
 			reg = <0x00 0x9fd00000 0x00 0x700000>;
+		};
+		
+		splash_region@b8000000 {
+			reg = <0x0 0xb8000000 0x0 0x2b00000>;
+			no-map;
+		};
+		
+		cdsp_secure_heap_region@80c00000 {
+			reg = <0x00 0x80c00000 0x00 0x100000>;
+			no-map;
 		};
 		
 		rmtfs_mem: memory@da300000 {
 			compatible = "qcom,rmtfs-mem";
 			reg = <0x0 0xda300000 0x0 0x280000>;
 			no-map;
-
 			qcom,client-id = <1>;
 			qcom,vmid = <QCOM_SCM_VMID_MSS_MSA>;
-		};
+		};		
 	};
 
 	vph_pwr: vph-pwr-regulator {
@@ -415,6 +442,7 @@
 	};
 };
 
+/*
 &gpi_dma0 {
 	status = "okay";
 };
@@ -426,6 +454,7 @@
 &gpi_dma2 {
 	status = "okay";
 };
+*/
 
 /*
 &i2c5 {
@@ -461,6 +490,7 @@
 };
 */
 
+/*
 &qupv3_id_0 {
 	status = "okay";
 };
@@ -472,6 +502,7 @@
 &qupv3_id_2 {
 	status = "okay";
 };
+*/
 
 &tlmm {
 	gpio-reserved-ranges = <28 4>, <36 4>;	
